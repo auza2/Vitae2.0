@@ -259,7 +259,7 @@
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                             <subviews>
                                 <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" showsTouchWhenHighlighted="YES" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="jTA-f5-fEP">
-                                    <rect key="frame" x="0.0" y="0.0" width="414" height="0.0"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="414" height="44"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                     <state key="normal" title="Create New Workout"/>
                                     <connections>
@@ -334,7 +334,7 @@
                                                     </state>
                                                 </button>
                                                 <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" fixedFrame="YES" insetsLayoutMarginsFromSafeArea="NO" usesAttributedText="YES" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="N4Z-m1-czv">
-                                                    <rect key="frame" x="20" y="0.0" width="140" height="44"/>
+                                                    <rect key="frame" x="20" y="0.0" width="303" height="44"/>
                                                     <autoresizingMask key="autoresizingMask"/>
                                                     <attributedString key="attributedText">
                                                         <fragment content="EXERCISE NAME">
@@ -426,6 +426,9 @@
                     <navigationItem key="navigationItem" title="WorkoutName" id="XM7-Hl-TgF">
                         <barButtonItem key="rightBarButtonItem" systemItem="add" id="3ia-wq-N1U">
                             <color key="tintColor" red="0.0" green="0.50196081400000003" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                            <connections>
+                                <action selector="openWorkoutLibrary:" destination="I0Q-fc-DuX" id="5Cr-zo-BLB"/>
+                            </connections>
                         </barButtonItem>
                     </navigationItem>
                     <connections>
@@ -434,7 +437,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="RJd-e3-OD0" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="3233" y="140"/>
+            <point key="canvasLocation" x="3231.884057971015" y="139.4021739130435"/>
         </scene>
         <!--Navigation Controller-->
         <scene sceneID="8vt-eD-zly">
@@ -482,7 +485,7 @@
                                                     </state>
                                                 </button>
                                                 <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" fixedFrame="YES" insetsLayoutMarginsFromSafeArea="NO" usesAttributedText="YES" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="a8f-BP-uKY">
-                                                    <rect key="frame" x="20" y="0.0" width="140" height="44"/>
+                                                    <rect key="frame" x="20" y="0.0" width="303" height="44"/>
                                                     <autoresizingMask key="autoresizingMask"/>
                                                     <attributedString key="attributedText">
                                                         <fragment content="EXERCISE NAME">

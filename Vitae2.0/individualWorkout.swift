@@ -15,70 +15,109 @@ class individualWorkout: UIViewController, UITableViewDelegate, UITableViewDataS
     
     var workout: Workout!
     var dummyWorkoutName: String!
-    var dummyExercises = [Exercise]()
+    var exercises = [Exercise]()
     var variants = [[Variant]]()
+    
+    weak var todaysWorkoutDelegate: TodaysWorkout?
+    weak var individualWorkoutDelegate: individualWorkout?
     
     @IBOutlet weak var tableView: UITableView!
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        guard let _ = workout else {return}
+
+        container = appDelegate.persistentContainer
         
-        // Uncomment the following line to preserve selection between presentations
-        // self.clearsSelectionOnViewWillAppear = false
+//        let exercise = Exercise(context: container.viewContext)
+//        exercise.name = "Dummy Exercise 2"
+//        let variant = Variant(context: container.viewContext)
+//        variant.sets = 12345
+//        variant.repetitions = 12345
+//        variant.weight = 12345
+//        variant.exercise = exercise
+//        workout.addToVariants(variant)
+//        appDelegate.saveContext()
         
+
         tableView.dataSource = self
         tableView.delegate = self
         tableView.tableFooterView = UIView()
-        
-        
-        container = appDelegate.persistentContainer
 
-        navigationItem.title = dummyWorkoutName
-        loadDummyWorkout()
+        navigationItem.title = workout.name
         loadSavedData()
     }
     
-    
-    func loadDummyWorkout(){
-        // Loading Dummy Workout
-        let workReq = Workout.createFetchRequest()
-        let workSort = NSSortDescriptor(key: "name", ascending: true)
-        workReq.predicate = NSPredicate(format: "name == %@", dummyWorkoutName)
-        workReq.sortDescriptors = [workSort]
-        
-        do{
-            let workouts = try container.viewContext.fetch(workReq)
-            workout = workouts[0]
-            tableView.reloadData()
-            print("found workouts \(workout.name)")
-        }catch{
-            print("Was not able to load Saved Data -- workouts")
-        }
-    }
-    
+    // MARK: Core Data
     func loadSavedData(){
-        let req = Exercise.createFetchRequest()
-        let sort = NSSortDescriptor(key: "name", ascending: true)
-        req.predicate = NSPredicate(format: "SUBQUERY(workouts, $x, $x.name == %@).@count == 1", dummyWorkoutName)
+        let req = Variant.createFetchRequest()
+        let sort = NSSortDescriptor(key: "weight", ascending: true)
         req.sortDescriptors = [sort]
-        
-        
+        req.predicate = NSPredicate(format: "SUBQUERY(workouts, $x, $x.name == %@ ).@count == 1", workout.name)
+
+        print("getting all variants for workout \(workout.name)")
+        var allVariantsForToday: [Variant]!
         do{
-            dummyExercises = try container.viewContext.fetch(req)
-            tableView.reloadData()
-            print("found \(dummyExercises.count) exercises")
+            allVariantsForToday = try container.viewContext.fetch(req)
+            print("found \(allVariantsForToday.count) variants for \(workout.name)")
         }catch{
             print("Was not able to load Saved Data")
         }
-        
+
         variants.removeAll()
-        for (_,exercise) in dummyExercises.enumerated(){
-            print("Getting variants for \(exercise.name)")
-            let variantsForExercise = loadVariants(for: exercise)
-            variants.append(variantsForExercise)
-            print("size of variants for the exercise: \(variantsForExercise.count)")
+        exercises.removeAll()
+
+        // Going through all the variants that are logged for today, find the exercises that it belongs to and
+        // give it to the variants and exercises array for easier display in table view
+        var exerciseIndex = 0
+        for (_,variant) in allVariantsForToday.enumerated(){
+            let exerciseForThisVariant = variant.value(forKey: "exercise") as! Exercise
+            print(exerciseForThisVariant.name)
+
+            let exercisesHasExerciseAlready = exercises.contains{ exerciseInExercises in
+                return exerciseInExercises.name == exerciseForThisVariant.name
+            }
+
+            if !exercisesHasExerciseAlready{
+                variants.append([Variant]())
+                exercises.append(exerciseForThisVariant)
+                exerciseIndex += 1
+            }
+
+            print("\(exerciseForThisVariant.name) | \(variant.sets) ,\(variant.repetitions), \(variant.weight) ")
+            variants[variants.count-1].append(variant)
         }
+        print("-------------")
+        
     }
+//    func loadSavedData(){
+//        let req = Exercise.createFetchRequest()
+//        let sort = NSSortDescriptor(key: "name", ascending: true)
+//        req.predicate = NSPredicate(format: "SUBQUERY(workouts, $x, $x.name == %@).@count == 1", workout.name)
+//        req.sortDescriptors = [sort]
+//
+//        do{
+//            exercises = try container.viewContext.fetch(req)
+//            tableView.reloadData()
+//            print("found \(exercises.count) exercises")
+//        }catch{
+//            print("Was not able to load Saved Data")
+//        }
+//
+//        variants.removeAll()
+////        for (_,exercise) in exercises.enumerated(){
+////            print("Getting variants for \(exercise.name)")
+////            let variantsForExercise = loadVariants(for: exercise)
+////            variants.append(variantsForExercise)
+////            print("size of variants for the exercise: \(variantsForExercise.count)")
+////        }
+//        for (_,exercise) in exercises.enumerated(){
+//            print("Getting variants for \(exercise.name)")
+//            let variantsForExercise = exercise.value(forKeyPath: "variants") as? [Variant] ?? [Variant]()
+//            variants.append(variantsForExercise)
+//            print("size of variants for the exercise: \(variantsForExercise.count)")
+//        }
+//    }
     
     func loadVariants(for exercise:Exercise) -> [Variant]{
         let req = Variant.createFetchRequest()
@@ -95,22 +134,15 @@ class individualWorkout: UIViewController, UITableViewDelegate, UITableViewDataS
         return [Variant]()
     }
     
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
-    }
-    
     // MARK: - Table view data source
-    
     func numberOfSections(in tableView: UITableView) -> Int {
-        return dummyExercises.count
+        return exercises.count
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         // #warning Incomplete implementation, return the number of rows
-        return dummyExercises[section].variants?.count ?? 0
+        return variants[section].count
     }
-    
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         guard let cell = tableView.dequeueReusableCell(withIdentifier: "variationCell", for: indexPath) as? variationCell else {return UITableViewCell()}
@@ -119,7 +151,7 @@ class individualWorkout: UIViewController, UITableViewDelegate, UITableViewDataS
         
         if isEditing{
             cell.checkButton.setImage(#imageLiteral(resourceName: "icons8-cancel-50"), for: .normal)
-            cell.checkButton.addTarget(self, action: #selector(buttonTapped(sender:)), for: .touchUpInside)
+            cell.checkButton.addTarget(self, action: #selector(deleteThisVariation(sender:)), for: .touchUpInside)
         }else{
             let image = (cell.checkButton.isSelected) ? #imageLiteral(resourceName: "icons8-tick-box-50") : #imageLiteral(resourceName: "icons8-unchecked-checkbox-50")
             cell.checkButton.setImage(image, for: .normal)
@@ -129,9 +161,6 @@ class individualWorkout: UIViewController, UITableViewDelegate, UITableViewDataS
         return cell
     }
     
-    
-    // Mark-- Table View header
-    
     func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
         guard let headerView = tableView.dequeueReusableCell(withIdentifier: "sectionHeader") as? sectionHeader else {return UIView()}
         if isEditing{
@@ -139,7 +168,7 @@ class individualWorkout: UIViewController, UITableViewDelegate, UITableViewDataS
         }else{
             headerView.addButton.removeFromSuperview()
         }
-        headerView.headerTitle?.text = dummyExercises[section].name.uppercased()
+        headerView.headerTitle?.text = exercises[section].name.uppercased()
         return headerView
     }
     
@@ -147,8 +176,18 @@ class individualWorkout: UIViewController, UITableViewDelegate, UITableViewDataS
         return 44.0
     }
     
-    // MARK: - Button taps
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        if let todaysWorkout = todaysWorkoutDelegate{
+            todaysWorkout.addVariantToToday(variants[indexPath.section][indexPath.row])
+            navigationController?.popToViewController(todaysWorkout, animated: true)
+        }
+        if let individualWorkout = individualWorkoutDelegate{
+            individualWorkout.addVariantToWorkout(variants[indexPath.section][indexPath.row])
+            navigationController?.popToViewController(individualWorkout, animated: true)
+        }
+    }
     
+    // MARK: - Button taps
     @objc func buttonTapped(sender: UIButton) {
         sender.isSelected = !sender.isSelected
         if sender.isSelected{
@@ -162,54 +201,53 @@ class individualWorkout: UIViewController, UITableViewDelegate, UITableViewDataS
         print("buttonTapped")
     }
     
+    @IBAction func openWorkoutLibrary(_ sender: Any) {
+        if let vc = storyboard?.instantiateViewController(withIdentifier: "ExerciseLibrary") as? UITabBarController{
+            
+            if let viewControllers = vc.viewControllers{
+                if let exercisesVC = viewControllers[0] as? Exercises{
+                    exercisesVC.individualWorkoutDelegate = self
+                }
+                if let workoutVC = viewControllers[1] as? Workouts{
+                    workoutVC.individualWorkoutDelegate = self
+                }
+            }
+            
+            navigationController?.pushViewController(vc, animated: true)
+        }
+    }
+    
+    // MARK: - Adding, Deleting, Editing Model
+    func addVariantToWorkout(_ variant: Variant){
+        workout.addToVariants(variant) //because we're using the same container this should work at creating a relationship
+        appDelegate.saveContext()
+        loadSavedData()
+        tableView.reloadData()
+    }
+    
+    @objc func deleteThisVariation(sender: UIButton){
+        print("remove this variant from this \(workout.name)")
+        if let cell = sender.superview?.superview as? variationCell {
+            let indexPath = tableView.indexPath(for: cell)!
+            let variantToRemove = variants[indexPath.section][indexPath.row]
+            variantToRemove.removeFromWorkouts(workout)
+            appDelegate.saveContext()
+            
+            let prevNumSection = variants.count
+            loadSavedData()
+            
+            if (prevNumSection > variants.count){
+                tableView.deleteSections([indexPath.section], with: .automatic)
+            }else{
+                tableView.deleteRows(at: [indexPath], with: .automatic)
+            }
+           tableView.reloadData()
+        }
+    }
+    
     @IBAction func edit(_ sender: Any) {
         isEditing = !isEditing
         tableView.reloadData()
     }
-    
-    /*
-     // Override to support conditional editing of the table view.
-     override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
-     // Return false if you do not want the specified item to be editable.
-     return true
-     }
-     */
-    
-    /*
-     // Override to support editing the table view.
-     override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath) {
-     if editingStyle == .delete {
-     // Delete the row from the data source
-     tableView.deleteRows(at: [indexPath], with: .fade)
-     } else if editingStyle == .insert {
-     // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view
-     }
-     }
-     */
-    
-    /*
-     // Override to support rearranging the table view.
-     override func tableView(_ tableView: UITableView, moveRowAt fromIndexPath: IndexPath, to: IndexPath) {
-     
-     }
-     */
-    
-    /*
-     // Override to support conditional rearranging of the table view.
-     override func tableView(_ tableView: UITableView, canMoveRowAt indexPath: IndexPath) -> Bool {
-     // Return false if you do not want the item to be re-orderable.
-     return true
-     }
-     */
-    
-    /*
-     // MARK: - Navigation
-     
-     // In a storyboard-based application, you will often want to do a little preparation before navigation
-     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-     // Get the new view controller using segue.destinationViewController.
-     // Pass the selected object to the new view controller.
-     }
-     */
 
 }

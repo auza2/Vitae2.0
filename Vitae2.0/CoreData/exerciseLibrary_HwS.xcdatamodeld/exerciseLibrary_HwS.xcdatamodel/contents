@@ -2,9 +2,7 @@
 <model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="13771" systemVersion="16G1212" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
     <entity name="Exercise" representedClassName="Exercise" syncable="YES">
         <attribute name="name" attributeType="String" syncable="YES"/>
-        <relationship name="logs" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Log" inverseName="exercises" inverseEntity="Log" syncable="YES"/>
         <relationship name="variants" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Variant" inverseName="exercise" inverseEntity="Variant" syncable="YES"/>
-        <relationship name="workouts" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Workout" inverseName="exercises" inverseEntity="Workout" syncable="YES"/>
         <fetchIndex name="byNameIndex">
             <fetchIndexElement property="name" type="Binary" order="ascending"/>
         </fetchIndex>
@@ -12,26 +10,27 @@
     <entity name="Log" representedClassName="Log" syncable="YES">
         <attribute name="date" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
         <attribute name="notes" optional="YES" attributeType="String" syncable="YES"/>
-        <relationship name="exercises" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Exercise" inverseName="logs" inverseEntity="Exercise" syncable="YES"/>
+        <relationship name="variants" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Variant" inverseName="logs" inverseEntity="Variant" syncable="YES"/>
     </entity>
     <entity name="Variant" representedClassName="Variant" syncable="YES">
-        <attribute name="datesLogged" optional="YES" attributeType="Transformable" customClassName="[Date]" syncable="YES"/>
         <attribute name="repetitions" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="sets" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="weight" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
         <relationship name="exercise" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Exercise" inverseName="variants" inverseEntity="Exercise" syncable="YES"/>
+        <relationship name="logs" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Log" inverseName="variants" inverseEntity="Log" syncable="YES"/>
+        <relationship name="workouts" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Workout" inverseName="variants" inverseEntity="Workout" syncable="YES"/>
     </entity>
     <entity name="Workout" representedClassName="Workout" syncable="YES">
         <attribute name="name" optional="YES" attributeType="String" syncable="YES"/>
-        <relationship name="exercises" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Exercise" inverseName="workouts" inverseEntity="Exercise" syncable="YES"/>
+        <relationship name="variants" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Variant" inverseName="workouts" inverseEntity="Variant" syncable="YES"/>
         <fetchIndex name="byWorkoutNameIndex">
             <fetchIndexElement property="name" type="Binary" order="ascending"/>
         </fetchIndex>
     </entity>
     <elements>
-        <element name="Exercise" positionX="-54" positionY="-99" width="128" height="103"/>
-        <element name="Log" positionX="-216" positionY="-259" width="128" height="88"/>
-        <element name="Variant" positionX="169" positionY="-117" width="128" height="118"/>
-        <element name="Workout" positionX="-351" positionY="-57" width="128" height="75"/>
+        <element name="Exercise" positionX="-369" positionY="-117" width="128" height="73"/>
+        <element name="Log" positionX="-2" positionY="-271" width="128" height="88"/>
+        <element name="Variant" positionX="-191" positionY="-145" width="128" height="133"/>
+        <element name="Workout" positionX="81" positionY="-148" width="128" height="73"/>
     </elements>
 </model>

@@ -25,7 +25,7 @@ class TodaysWorkout: UIViewController, UITableViewDelegate,UITableViewDataSource
     var container: NSPersistentContainer!
     
     var todaysLog: Log!
-    var dummyExercises = [Exercise]()
+    var exercises = [Exercise]()
     var variants = [[Variant]]()
     @IBOutlet weak var tableView: UITableView!
     
@@ -43,7 +43,6 @@ class TodaysWorkout: UIViewController, UITableViewDelegate,UITableViewDataSource
     }
     
     // MARK: Core Data
-    
     func setUpLog(){
         // If there is no log currently with today's date then create one if there is then set it to today's Log
         let req = Log.createFetchRequest()
@@ -60,6 +59,7 @@ class TodaysWorkout: UIViewController, UITableViewDelegate,UITableViewDataSource
                 todaysLog = logs[0]
                 print("found \(logs.count) logs for today // If more than one something went wrong")
                 loadSavedData()
+                tableView.reloadData()
             }else{
                 todaysLog = Log(context: container.viewContext)
                 todaysLog.date = Date()
@@ -72,59 +72,43 @@ class TodaysWorkout: UIViewController, UITableViewDelegate,UITableViewDataSource
     }
     
     func loadSavedData(){
-        let req = Exercise.createFetchRequest()
-        let sort = NSSortDescriptor(key: "name", ascending: true)
+        let req = Variant.createFetchRequest()
+        let sort = NSSortDescriptor(key: "weight", ascending: true)
         req.sortDescriptors = [sort]
         req.predicate = NSPredicate(format: "SUBQUERY(logs, $x, $x.date >= %@ AND $x.date <= %@).@count == 1", todaysLog.date.getStartOfDay(), todaysLog.date.getEndOfDay())
-        
+
+        var allVariantsForToday: [Variant]!
         do{
-            dummyExercises = try container.viewContext.fetch(req)
-            print("found \(dummyExercises.count) exercises for \(todaysLog.date)")
+            allVariantsForToday = try container.viewContext.fetch(req)
+            print("found \(variants.count) variants for \(todaysLog.date)")
         }catch{
             print("Was not able to load Saved Data")
         }
-        
+
         variants.removeAll()
-        for (_,exercise) in dummyExercises.enumerated(){
-            print("Getting variants for \(exercise.name)")
-            let variantsForExercise = loadVariants(for: exercise)
-            variants.append(variantsForExercise)
-            print("size of variants for the exercise: \(variantsForExercise.count)")
+        exercises.removeAll()
+        
+        // Going through all the variants that are logged for today, find the exercises that it belongs to and
+        // give it to the variants and exercises array for easier display in table view
+        var exerciseIndex = 0
+        for (_,variant) in allVariantsForToday.enumerated(){
+            let exerciseForThisVariant = variant.value(forKey: "exercise") as! Exercise
+            print(exerciseForThisVariant.name)
+            
+            let exercisesHasExerciseAlready = exercises.contains{ exerciseInExercises in
+                return exerciseInExercises.name == exerciseForThisVariant.name
+            }
+
+            if !exercisesHasExerciseAlready{
+                variants.append([Variant]())
+                exercises.append(exerciseForThisVariant)
+                exerciseIndex += 1
+            }
+            
+            variants[variants.count-1].append(variant)
         }
-        tableView.reloadData()
     }
     
-    func loadVariants(for exercise:Exercise) -> [Variant]{
-        let req = Variant.createFetchRequest()
-        let sort = NSSortDescriptor(key: "weight", ascending: false)
-        req.predicate = NSPredicate(format: "exercise.name == %@", exercise.name)
-        req.sortDescriptors = [sort]
-        let startDate = todaysLog.date.getStartOfDay() as Date
-        let endDate = todaysLog.date.getEndOfDay() as Date
-        
-        do{
-            let variantsForExercise = try container.viewContext.fetch(req)
-            var variantsWithDate = [Variant]()
-            for variant in variantsForExercise{
-                if let variantHasToday = variant.datesLogged?.contains(where: { element in
-                    if (element >= startDate  && element <= endDate){
-                        return true
-                    }else{
-                        return false
-                    }
-                }){
-                    if variantHasToday{
-                        variantsWithDate.append(variant)
-                    }
-                }
-            }
-            print("found \(variantsWithDate.count) variants for \(exercise.name)")
-            return variantsWithDate
-        }catch{
-            print("Could not fetch variants for exercise \(exercise.name)")
-        }
-        return [Variant]()
-    }
 
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
@@ -133,7 +117,7 @@ class TodaysWorkout: UIViewController, UITableViewDelegate,UITableViewDataSource
 
     // MARK: - Table view data source
     func numberOfSections(in tableView: UITableView) -> Int {
-        return dummyExercises.count
+        return exercises.count
     }
 
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -145,7 +129,7 @@ class TodaysWorkout: UIViewController, UITableViewDelegate,UITableViewDataSource
         guard let cell = tableView.dequeueReusableCell(withIdentifier: "variationCell", for: indexPath) as? variationCell else {return UITableViewCell()}
 
         cell.variationLabel?.text = "\(variants[indexPath.section][(indexPath.row)].sets) X \(variants[indexPath.section][(indexPath.row)].repetitions) \(variants[indexPath.section][(indexPath.row)].weight)lb"
-        
+
         if isEditing{
             cell.checkButton.setImage(#imageLiteral(resourceName: "icons8-cancel-50"), for: .normal)
             cell.checkButton.addTarget(self, action: #selector(deleteThisVariation(sender:)), for: .touchUpInside)
@@ -165,7 +149,7 @@ class TodaysWorkout: UIViewController, UITableViewDelegate,UITableViewDataSource
         }else{
             headerView.addButton.removeFromSuperview()
         }
-        headerView.headerTitle?.text = dummyExercises[section].name.uppercased()
+        headerView.headerTitle?.text = exercises[section].name.uppercased()
         return headerView
     }
     
@@ -200,23 +184,25 @@ class TodaysWorkout: UIViewController, UITableViewDelegate,UITableViewDataSource
     // MARK: - Adding, Deleting, Editing Model
     @IBAction func openWorkoutLibrary(_ sender: Any) {
         if let vc = storyboard?.instantiateViewController(withIdentifier: "ExerciseLibrary") as? UITabBarController{
-            // To - do will have to give the a "today" signifier to the exercise library
+            
             if let viewControllers = vc.viewControllers{
                 if let exercisesVC = viewControllers[0] as? Exercises{
-                    exercisesVC.delegate = self
+                    exercisesVC.todaysWorkoutDelegate = self
                 }
-                // to do - create delegate for workouts
+                if let workoutVC = viewControllers[1] as? Workouts{
+                    workoutVC.todaysWorkoutDelegate = self
+                }
             }
             
             navigationController?.pushViewController(vc, animated: true)
         }
     }
-    
-    func addExerciseToToday(_ exercise: Exercise){
-        todaysLog.addToExercises(exercise) // because we're using the same container this should work at creating a relationship
+
+    func addVariantToToday(_ variant: Variant){
+        todaysLog.addToVariants(variant)
         appDelegate.saveContext()
         loadSavedData()
-        print("Today's log now has \(String(describing: todaysLog.exercises?.count)) exercises")
+        tableView.reloadData()
     }
 
     @objc func deleteThisVariation(sender: UIButton){
@@ -224,14 +210,18 @@ class TodaysWorkout: UIViewController, UITableViewDelegate,UITableViewDataSource
         if let cell = sender.superview?.superview as? variationCell {
             let indexPath = tableView.indexPath(for: cell)!
             let variantToRemoveDate = variants[indexPath.section][indexPath.row]
+            variantToRemoveDate.removeFromLogs(todaysLog)
+            appDelegate.saveContext()
             
-            if let indexDateToRemove = variantToRemoveDate.datesLogged?.index(of: todaysLog.date){
-                // doesnt work because the dates will never be the same cause its a specific time also. There needs to be a better way of doing this
-                variantToRemoveDate.datesLogged?.remove(at: indexDateToRemove)
-                appDelegate.saveContext()
-                loadSavedData()
-                tableView.reloadData()
+            let prevNumSection = variants.count
+            loadSavedData()
+            
+            if (prevNumSection > variants.count){
+                tableView.deleteSections([indexPath.section], with: .automatic)
+            }else{
+                tableView.deleteRows(at: [indexPath], with: .automatic)
             }
+            tableView.reloadData()
         }
     }
 }

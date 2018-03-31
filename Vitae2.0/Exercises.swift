@@ -17,7 +17,7 @@ class ExerciseCell: UITableViewCell{
 }
 
 protocol tableViewCellDelegate : class {
-    func moreOptions(_ sender: ExerciseCell)
+    func moreOptions(_ sender: ExerciseCell) // To do will show data
 }
 
 class Exercises: UITableViewController, tableViewCellDelegate {
@@ -27,7 +27,8 @@ class Exercises: UITableViewController, tableViewCellDelegate {
     var exercises = [Exercise]()
     var indexOfExerciseAdd: IndexPath?
     
-    var delegate: TodaysWorkout?
+    weak var todaysWorkoutDelegate: TodaysWorkout?
+    weak var individualWorkoutDelegate: individualWorkout?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -98,7 +99,8 @@ class Exercises: UITableViewController, tableViewCellDelegate {
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         if let vc = storyboard?.instantiateViewController(withIdentifier: "individualExercise") as? individualExercise{
             vc.dummyExerciseName = exercises[indexPath.row].name
-            vc.delegate = self
+            vc.todaysWorkoutDelegate = todaysWorkoutDelegate
+            vc.individualWorkoutDelegate = individualWorkoutDelegate
             vc.exercise = exercises[indexPath.row]
             navigationController?.pushViewController(vc, animated: true)
         }
@@ -116,30 +118,31 @@ class Exercises: UITableViewController, tableViewCellDelegate {
 //        }
     }
     
-    func addExerciseTo(_ workout:Workout){
-        let req = Workout.createFetchRequest()
-        let descriptor = NSSortDescriptor(key: "name", ascending: true)
-        req.sortDescriptors = [descriptor]
-        req.predicate = NSPredicate(format: "name == %@", workout.name)
-
-        do{
-            let fetchedWorkouts = try container.viewContext.fetch(req)
-            if let indexPath = indexOfExerciseAdd{
-                fetchedWorkouts[0].addToExercises(exercises[indexPath.row])
-                
-                appDelegate.saveContext()
-                loadSavedData()
-                indexOfExerciseAdd = nil
-            }
-        }catch{
-            print("\(error)")
-        }
-    }
+//    func addExerciseTo(_ workout:Workout){
+//        let req = Workout.createFetchRequest()
+//        let descriptor = NSSortDescriptor(key: "name", ascending: true)
+//        req.sortDescriptors = [descriptor]
+//        req.predicate = NSPredicate(format: "name == %@", workout.name)
+//
+//        do{
+//            let fetchedWorkouts = try container.viewContext.fetch(req)
+//            if let indexPath = indexOfExerciseAdd{
+//                fetchedWorkouts[0].addToExercises(exercises[indexPath.row])
+//
+//                appDelegate.saveContext()
+//                loadSavedData()
+//                indexOfExerciseAdd = nil
+//            }
+//        }catch{
+//            print("\(error)")
+//        }
+//    }
     
     // MARK -- Adding, Deleting, Editing Model
-    func returnExercise(_ exercise: Exercise){
-        delegate?.addExerciseToToday(exercise)
-        _ = navigationController?.popToRootViewController(animated: true)
+    func returnExercise(_ variant: Variant){
+        todaysWorkoutDelegate?.addVariantToToday(variant)
+        individualWorkoutDelegate?.addVariantToWorkout(variant)
+        navigationController?.popViewController(animated: true)
     }
     
     override func didReceiveMemoryWarning() {

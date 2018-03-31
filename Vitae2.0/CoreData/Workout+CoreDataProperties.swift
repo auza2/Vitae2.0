@@ -1,8 +1,8 @@
 //
 //  Workout+CoreDataProperties.swift
-//  exerciseLibrary_HwS
+//  Vitae2.0
 //
-//  Created by Jamie Auza on 3/13/18.
+//  Created by Jamie Auza on 3/30/18.
 //  Copyright © 2018 Jamie Auza. All rights reserved.
 //
 //
@@ -18,23 +18,23 @@ extension Workout {
     }
 
     @NSManaged public var name: String
-    @NSManaged public var exercises: [Exercise]?
+    @NSManaged public var variants: [Variant]?
 
 }
 
-// MARK: Generated accessors for exercises
+// MARK: Generated accessors for variants
 extension Workout {
 
-    @objc(addExercisesObject:)
-    @NSManaged public func addToExercises(_ value: Exercise)
+    @objc(addVariantsObject:)
+    @NSManaged public func addToVariants(_ value: Variant)
 
-    @objc(removeExercisesObject:)
-    @NSManaged public func removeFromExercises(_ value: Exercise)
+    @objc(removeVariantsObject:)
+    @NSManaged public func removeFromVariants(_ value: Variant)
 
-    @objc(addExercises:)
-    @NSManaged public func addToExercises(_ values: [Exercise])
+    @objc(addVariants:)
+    @NSManaged public func addToVariants(_ values: [Variant])
 
-    @objc(removeExercises:)
-    @NSManaged public func removeFromExercises(_ values: [Exercise])
+    @objc(removeVariants:)
+    @NSManaged public func removeFromVariants(_ values: [Variant])
 
 }

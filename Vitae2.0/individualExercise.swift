@@ -16,7 +16,9 @@ class individualExercise: UIViewController, UITableViewDelegate, UITableViewData
     var dummyExerciseName: String!
     var exercise: Exercise!
     var variants: [Variant]!
-    var delegate: Exercises?
+    
+    weak var todaysWorkoutDelegate: TodaysWorkout?
+    weak var individualWorkoutDelegate: individualWorkout?
     
     @IBOutlet weak var tableView: UITableView!
     
@@ -101,15 +103,13 @@ class individualExercise: UIViewController, UITableViewDelegate, UITableViewData
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        if let ExercisesVC = delegate{
-            if variants[indexPath.row].datesLogged == nil{
-                variants[indexPath.row].datesLogged = [Date]()
-            }
-            variants[indexPath.row].datesLogged?.append(Date())
-            appDelegate.saveContext()
-            
-            ExercisesVC.returnExercise(exercise)
-            navigationController?.popViewController(animated: true)
+        if let todaysWorkout = todaysWorkoutDelegate{
+            todaysWorkout.addVariantToToday(variants[indexPath.row])
+            navigationController?.popToViewController(todaysWorkout, animated: true)
+        }
+        if let individualWorkout = individualWorkoutDelegate{
+            individualWorkout.addVariantToWorkout(variants[indexPath.row])
+            navigationController?.popToViewController(individualWorkout, animated: true)
         }
     }
     
