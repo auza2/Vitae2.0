@@ -10,9 +10,19 @@ import UIKit
 import CoreData
 
 class sectionHeader: UITableViewCell{
+    var delegate: tableViewCellDelegate!
+    var section: Int!
     @IBOutlet weak var moreOptionsButton: UIButton!
     @IBOutlet weak var headerTitle: UILabel!
     @IBOutlet weak var addButton: UIButton!
+    
+    @IBAction func moreOptions(_ sender: Any) {
+        delegate.moreOptions(self)
+    }
+}
+
+protocol tableViewCellDelegate{
+    func moreOptions(_ header: sectionHeader)
 }
 
 class variationCell: UITableViewCell{
@@ -20,14 +30,22 @@ class variationCell: UITableViewCell{
     @IBOutlet weak var checkButton: UIButton!
 }
 
-class TodaysWorkout: UIViewController, UITableViewDelegate,UITableViewDataSource {
+class TodaysWorkout: UIViewController, UITableViewDelegate,UITableViewDataSource, tableViewCellDelegate{
+
     var appDelegate = UIApplication.shared.delegate as! AppDelegate
     var container: NSPersistentContainer!
     
     var todaysLog: Log!
     var exercises = [Exercise]()
     var variants = [[Variant]]()
+    
+    var data = [String: exerciseWithVariants]()
     @IBOutlet weak var tableView: UITableView!
+    
+    struct exerciseWithVariants{
+        var exercise: Exercise
+        var variants: [Variant]
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -61,9 +79,12 @@ class TodaysWorkout: UIViewController, UITableViewDelegate,UITableViewDataSource
                 loadSavedData()
                 tableView.reloadData()
             }else{
+//                let calendar = Calendar.current
+//                let components = DateComponents(year: 2018, month: 3, day: 3, hour: 3, minute: 1, second: 1)
                 todaysLog = Log(context: container.viewContext)
+//                todaysLog.date = calendar.date(from: components)!
                 todaysLog.date = Date()
-                print("created new log for today")
+                print("created new log for \(todaysLog.date)")
                 appDelegate.saveContext()
             }
         }catch{
@@ -103,13 +124,14 @@ class TodaysWorkout: UIViewController, UITableViewDelegate,UITableViewDataSource
                 variants.append([Variant]())
                 exercises.append(exerciseForThisVariant)
                 exerciseIndex += 1
+                variants[variants.count-1].append(variant)
+            }else{
+                let indexOfExercise = exercises.index(of: exerciseForThisVariant) ?? variants.count-1
+                variants[indexOfExercise].append(variant)
             }
-            
-            variants[variants.count-1].append(variant)
         }
     }
     
-
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
@@ -132,11 +154,13 @@ class TodaysWorkout: UIViewController, UITableViewDelegate,UITableViewDataSource
 
         if isEditing{
             cell.checkButton.setImage(#imageLiteral(resourceName: "icons8-cancel-50"), for: .normal)
+            cell.checkButton.removeTarget(nil, action: nil, for: .allEvents)
             cell.checkButton.addTarget(self, action: #selector(deleteThisVariation(sender:)), for: .touchUpInside)
         }else{
             let image = (cell.checkButton.isSelected) ? #imageLiteral(resourceName: "icons8-tick-box-50") : #imageLiteral(resourceName: "icons8-unchecked-checkbox-50")
             cell.checkButton.setImage(image, for: .normal)
-            cell.checkButton.addTarget(self, action: #selector(buttonTapped(sender:)), for: .touchUpInside)
+            cell.checkButton.removeTarget(nil, action: nil, for: .allEvents)
+            cell.checkButton.addTarget(self, action: #selector(markAsDone(sender:)), for: .touchUpInside)
         }
 
         return cell
@@ -144,6 +168,10 @@ class TodaysWorkout: UIViewController, UITableViewDelegate,UITableViewDataSource
 
     func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
         guard let headerView = tableView.dequeueReusableCell(withIdentifier: "sectionHeader") as? sectionHeader else {return UIView()}
+        
+        headerView.delegate = self
+        headerView.section = section
+       
         if isEditing{
             headerView.addButton.addTarget(self, action: #selector(addButton(sender:)), for: .touchUpInside)
         }else{
@@ -158,7 +186,7 @@ class TodaysWorkout: UIViewController, UITableViewDelegate,UITableViewDataSource
     }
     
     // MARK: - Button taps
-    @objc func buttonTapped(sender: UIButton) {
+    @objc func markAsDone(sender: UIButton) {
         sender.isSelected = !sender.isSelected
         if !isEditing{
             if sender.isSelected{
@@ -169,7 +197,24 @@ class TodaysWorkout: UIViewController, UITableViewDelegate,UITableViewDataSource
         }
     }
     
+    func moreOptions(_ header: sectionHeader){
+        let exerciseShown = exercises[header.section]
+        
+        if let vc = storyboard?.instantiateViewController(withIdentifier: "dataView") as? UITabBarController{
+            
+            if let viewControllers = vc.viewControllers{
+                // to do -- instantiate first view controller
+                if let history = viewControllers[0] as? History{
+                    history.exercise  = exerciseShown
+                }
+            }
+            
+            navigationController?.pushViewController(vc, animated: true)
+        }
+    }
+
     @objc func addButton(sender: UIButton!){
+        /// still need to do
         print("buttonTapped")
     }
     
@@ -198,8 +243,11 @@ class TodaysWorkout: UIViewController, UITableViewDelegate,UITableViewDataSource
         }
     }
 
-    func addVariantToToday(_ variant: Variant){
-        todaysLog.addToVariants(variant)
+    func addVariantToToday(_ variantsToAdd: [Variant]){
+        for eachVariant in variantsToAdd{
+            todaysLog.addToVariants(eachVariant) // For some reason I cannot use "func addToVariants(_ values: [Variant])" to insert a whole array
+        }
+        
         appDelegate.saveContext()
         loadSavedData()
         tableView.reloadData()
@@ -219,7 +267,7 @@ class TodaysWorkout: UIViewController, UITableViewDelegate,UITableViewDataSource
             if (prevNumSection > variants.count){
                 tableView.deleteSections([indexPath.section], with: .automatic)
             }else{
-                tableView.deleteRows(at: [indexPath], with: .automatic)
+                tableView.deleteRows(at: [indexPath], with: .right)
             }
             tableView.reloadData()
         }
@@ -227,6 +275,7 @@ class TodaysWorkout: UIViewController, UITableViewDelegate,UITableViewDataSource
 }
 
 extension Date{
+    
     func getStartOfDay() -> NSDate{
         let calendar = Calendar.current
         var components = calendar.dateComponents([.year, .month, .day, .hour, .minute, .second], from: self )

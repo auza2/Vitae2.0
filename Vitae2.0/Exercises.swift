@@ -9,21 +9,12 @@
 import UIKit
 import CoreData
 class ExerciseCell: UITableViewCell{
-    weak var tableviewCellDelegate: tableViewCellDelegate?
     @IBOutlet weak var titleLabel: UILabel!
-//    @IBAction func moreOptions(_ sender: Any) {
-//        tableviewCellDelegate?.moreOptions(self)
-//    }
 }
 
-protocol tableViewCellDelegate : class {
-    func moreOptions(_ sender: ExerciseCell) // To do will show data
-}
-
-class Exercises: UITableViewController, tableViewCellDelegate {
+class Exercises: UITableViewController{
     var appDelegate = UIApplication.shared.delegate as! AppDelegate
     var container: NSPersistentContainer!
-    var workout: Workout?
     var exercises = [Exercise]()
     var indexOfExerciseAdd: IndexPath?
     
@@ -35,10 +26,6 @@ class Exercises: UITableViewController, tableViewCellDelegate {
         
         container = appDelegate.persistentContainer
         loadSavedData()
-        
-        if let detailWorkout = workout{
-            navigationItem.title = detailWorkout.name
-        }
     }
     
     // MARK -- Core Data
@@ -48,9 +35,6 @@ class Exercises: UITableViewController, tableViewCellDelegate {
         let sort = NSSortDescriptor(key: "name", ascending: true)
         req.sortDescriptors = [sort]
         
-        if let detailWorkout = workout{
-            req.predicate = NSPredicate(format: "SUBQUERY(workouts, $x, $x.name == %@).@count == 1", detailWorkout.name)
-        }
         
         do{
             exercises = try container.viewContext.fetch(req)
@@ -90,7 +74,6 @@ class Exercises: UITableViewController, tableViewCellDelegate {
         
         if let exerciseCell = cell as? ExerciseCell{
             exerciseCell.titleLabel.text = exercises[indexPath.row].name
-            exerciseCell.tableviewCellDelegate = self
         }
         
         return cell
@@ -106,42 +89,11 @@ class Exercises: UITableViewController, tableViewCellDelegate {
         }
     }
     
-    //MARK -- TableViewCell Delegate
-    func moreOptions(_ sender: ExerciseCell) {
-        guard let indexPath = tableView.indexPath(for: sender) else { return }
-        indexOfExerciseAdd = indexPath
-//        if let vc = storyboard?.instantiateViewController(withIdentifier: "workoutsView") as? WorkoutsViewController{
-//            vc.navigationItem.title = "Choose Workout"
-//            vc.exercise = exercises[indexPath.row]
-//            vc.delegate = self
-//            navigationController?.pushViewController(vc, animated: true)
-//        }
-    }
-    
-//    func addExerciseTo(_ workout:Workout){
-//        let req = Workout.createFetchRequest()
-//        let descriptor = NSSortDescriptor(key: "name", ascending: true)
-//        req.sortDescriptors = [descriptor]
-//        req.predicate = NSPredicate(format: "name == %@", workout.name)
-//
-//        do{
-//            let fetchedWorkouts = try container.viewContext.fetch(req)
-//            if let indexPath = indexOfExerciseAdd{
-//                fetchedWorkouts[0].addToExercises(exercises[indexPath.row])
-//
-//                appDelegate.saveContext()
-//                loadSavedData()
-//                indexOfExerciseAdd = nil
-//            }
-//        }catch{
-//            print("\(error)")
-//        }
-//    }
     
     // MARK -- Adding, Deleting, Editing Model
     func returnExercise(_ variant: Variant){
-        todaysWorkoutDelegate?.addVariantToToday(variant)
-        individualWorkoutDelegate?.addVariantToWorkout(variant)
+        todaysWorkoutDelegate?.addVariantToToday([variant])
+        individualWorkoutDelegate?.addVariantToWorkout([variant])
         navigationController?.popViewController(animated: true)
     }
     

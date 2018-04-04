@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		B0A5EDAD206AE55E006A4B20 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0A5EDAC206AE55E006A4B20 /* AppDelegate.swift */; };
-		B0A5EDAF206AE55E006A4B20 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0A5EDAE206AE55E006A4B20 /* ViewController.swift */; };
 		B0A5EDB2206AE55E006A4B20 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B0A5EDB0206AE55E006A4B20 /* Main.storyboard */; };
 		B0A5EDB5206AE55E006A4B20 /* Vitae2_0.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = B0A5EDB3206AE55E006A4B20 /* Vitae2_0.xcdatamodeld */; };
 		B0A5EDB7206AE55E006A4B20 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B0A5EDB6206AE55E006A4B20 /* Assets.xcassets */; };
@@ -27,12 +26,13 @@
 		B0A5EDDE206C735D006A4B20 /* individualExercise.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0A5EDDD206C735D006A4B20 /* individualExercise.swift */; };
 		B0A5EDE9206D86D6006A4B20 /* Log+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0A5EDE7206D86D6006A4B20 /* Log+CoreDataClass.swift */; };
 		B0A5EDEA206D86D6006A4B20 /* Log+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0A5EDE8206D86D6006A4B20 /* Log+CoreDataProperties.swift */; };
+		B0BDB483207176D6008CEADB /* History.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0BDB482207176D6008CEADB /* History.swift */; };
+		B0BDB48520744B18008CEADB /* GraphView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0BDB48420744B17008CEADB /* GraphView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		B0A5EDA9206AE55E006A4B20 /* Vitae2.0.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Vitae2.0.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		B0A5EDAC206AE55E006A4B20 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		B0A5EDAE206AE55E006A4B20 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
 		B0A5EDB1206AE55E006A4B20 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		B0A5EDB4206AE55E006A4B20 /* Vitae2_0.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Vitae2_0.xcdatamodel; sourceTree = "<group>"; };
 		B0A5EDB6206AE55E006A4B20 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -52,6 +52,8 @@
 		B0A5EDDD206C735D006A4B20 /* individualExercise.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = individualExercise.swift; sourceTree = "<group>"; };
 		B0A5EDE7206D86D6006A4B20 /* Log+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Log+CoreDataClass.swift"; sourceTree = "<group>"; };
 		B0A5EDE8206D86D6006A4B20 /* Log+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Log+CoreDataProperties.swift"; sourceTree = "<group>"; };
+		B0BDB482207176D6008CEADB /* History.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = History.swift; sourceTree = "<group>"; };
+		B0BDB48420744B17008CEADB /* GraphView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GraphView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -86,13 +88,14 @@
 			children = (
 				B0A5EDD2206B0D0B006A4B20 /* CoreData */,
 				B0A5EDAC206AE55E006A4B20 /* AppDelegate.swift */,
-				B0A5EDAE206AE55E006A4B20 /* ViewController.swift */,
 				B0A5EDB0206AE55E006A4B20 /* Main.storyboard */,
 				B0A5EDC1206B0CA8006A4B20 /* TodaysWorkout.swift */,
 				B0A5EDD5206C5A35006A4B20 /* Workouts.swift */,
 				B0A5EDD7206C5AD9006A4B20 /* Exercises.swift */,
 				B0A5EDDB206C6535006A4B20 /* individualWorkout.swift */,
 				B0A5EDDD206C735D006A4B20 /* individualExercise.swift */,
+				B0BDB482207176D6008CEADB /* History.swift */,
+				B0BDB48420744B17008CEADB /* GraphView.swift */,
 				B0A5EDB6206AE55E006A4B20 /* Assets.xcassets */,
 				B0A5EDB8206AE55E006A4B20 /* LaunchScreen.storyboard */,
 				B0A5EDBB206AE55E006A4B20 /* Info.plist */,
@@ -189,17 +192,18 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B0BDB483207176D6008CEADB /* History.swift in Sources */,
 				B0A5EDCB206B0CF9006A4B20 /* Exercise+CoreDataClass.swift in Sources */,
 				B0A5EDD8206C5ADA006A4B20 /* Exercises.swift in Sources */,
 				B0A5EDCD206B0CF9006A4B20 /* exerciseLibrary_HwS.xcdatamodeld in Sources */,
 				B0A5EDCE206B0CF9006A4B20 /* Workout+CoreDataProperties.swift in Sources */,
 				B0A5EDD0206B0CF9006A4B20 /* Variant+CoreDataClass.swift in Sources */,
-				B0A5EDAF206AE55E006A4B20 /* ViewController.swift in Sources */,
 				B0A5EDDC206C6535006A4B20 /* individualWorkout.swift in Sources */,
 				B0A5EDEA206D86D6006A4B20 /* Log+CoreDataProperties.swift in Sources */,
 				B0A5EDCF206B0CF9006A4B20 /* Variant+CoreDataProperties.swift in Sources */,
 				B0A5EDE9206D86D6006A4B20 /* Log+CoreDataClass.swift in Sources */,
 				B0A5EDC2206B0CA8006A4B20 /* TodaysWorkout.swift in Sources */,
+				B0BDB48520744B18008CEADB /* GraphView.swift in Sources */,
 				B0A5EDAD206AE55E006A4B20 /* AppDelegate.swift in Sources */,
 				B0A5EDD6206C5A36006A4B20 /* Workouts.swift in Sources */,
 				B0A5EDB5206AE55E006A4B20 /* Vitae2_0.xcdatamodeld in Sources */,

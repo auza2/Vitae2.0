@@ -61,9 +61,9 @@ class Workouts: UITableViewController {
     
     func returnExercise(_ variant: Variant){
         if let todayVC = todaysWorkoutDelegate{
-            todayVC.addVariantToToday(variant)
+            todayVC.addVariantToToday([variant])
         }
-        individualWorkoutDelegate?.addVariantToWorkout(variant)
+        individualWorkoutDelegate?.addVariantToWorkout([variant])
         navigationController?.popViewController(animated: true)
     }
     

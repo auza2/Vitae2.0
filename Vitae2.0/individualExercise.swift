@@ -20,7 +20,20 @@ class individualExercise: UIViewController, UITableViewDelegate, UITableViewData
     weak var todaysWorkoutDelegate: TodaysWorkout?
     weak var individualWorkoutDelegate: individualWorkout?
     
+    var isMultiAdding = false{
+        didSet{
+            navigationItem.rightBarButtonItem?.isEnabled = !isMultiAdding
+        }
+    }
+    var numAdding: Int = 0{
+        didSet{
+            let buttonLabel = (numAdding > 0 ) ? "Add" : "Multi Add"
+            multiAddButton.setTitle(buttonLabel, for: .normal)
+        }
+    }
+    
     @IBOutlet weak var tableView: UITableView!
+    @IBOutlet weak var multiAddButton: UIButton!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -39,7 +52,6 @@ class individualExercise: UIViewController, UITableViewDelegate, UITableViewData
     }
     
     // MARK: - Core Data
-    
     func loadSavedData(){
         let req = Variant.createFetchRequest()
         let sort = NSSortDescriptor(key: "weight", ascending: true)
@@ -75,13 +87,18 @@ class individualExercise: UIViewController, UITableViewDelegate, UITableViewData
         
          cell.variationLabel?.text = "Weight: \(variants[indexPath.row].weight) | Set: \(variants[indexPath.row].sets) | Rep: \(variants[indexPath.row].repetitions)"
         
-        if isEditing{
-            cell.checkButton.setImage(#imageLiteral(resourceName: "icons8-cancel-50"), for: .normal)
-            cell.checkButton.addTarget(self, action: #selector(buttonTapped(sender:)), for: .touchUpInside)
-        }else{
-            let image = (cell.checkButton.isSelected) ? #imageLiteral(resourceName: "icons8-tick-box-50") : #imageLiteral(resourceName: "icons8-unchecked-checkbox-50")
+        if isMultiAdding{
+            UIView.animate(withDuration: 0.5, animations: {
+                cell.checkButton.frame.origin.x = 20
+            })
+            
+            let image = (cell.checkButton.isSelected) ? #imageLiteral(resourceName: "icons8-checked-50") : #imageLiteral(resourceName: "icons8-full-moon-50")
             cell.checkButton.setImage(image, for: .normal)
-            cell.checkButton.addTarget(self, action: #selector(buttonTapped(sender:)), for: .touchUpInside)
+            cell.checkButton.addTarget(self, action: #selector(mulitSelect(sender:)), for: .touchUpInside)
+        }else{
+            UIView.animate(withDuration: 0.5, animations: {
+                cell.checkButton.frame.origin.x = -cell.checkButton.frame.width
+            })
         }
         
         return cell
@@ -89,11 +106,7 @@ class individualExercise: UIViewController, UITableViewDelegate, UITableViewData
 
     func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
         guard let headerView = tableView.dequeueReusableCell(withIdentifier: "sectionHeader") as? sectionHeader else {return UIView()}
-        if isEditing{
-            headerView.addButton.addTarget(self, action: #selector(addButton(sender:)), for: .touchUpInside)
-        }else{
-            headerView.addButton.removeFromSuperview()
-        }
+        headerView.addButton.removeFromSuperview() // the ability to add is already in the navigation view
         headerView.headerTitle?.text = dummyExerciseName
         return headerView
     }
@@ -103,23 +116,36 @@ class individualExercise: UIViewController, UITableViewDelegate, UITableViewData
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        if let todaysWorkout = todaysWorkoutDelegate{
-            todaysWorkout.addVariantToToday(variants[indexPath.row])
-            navigationController?.popToViewController(todaysWorkout, animated: true)
-        }
-        if let individualWorkout = individualWorkoutDelegate{
-            individualWorkout.addVariantToWorkout(variants[indexPath.row])
-            navigationController?.popToViewController(individualWorkout, animated: true)
-        }
+        if isMultiAdding { return }
+        returnVariantsToAdd([variants[indexPath.row]])
     }
     
     // MARK: - Button taps
-    @objc func buttonTapped(sender: UIButton) {
+    @objc func mulitSelect(sender: UIButton) {
         sender.isSelected = !sender.isSelected
-        if sender.isSelected{
-            sender.setImage(#imageLiteral(resourceName: "icons8-tick-box-50"), for: .normal)
-        }else{
-            sender.setImage(#imageLiteral(resourceName: "icons8-unchecked-checkbox-50"), for: .normal)
+        numAdding = sender.isSelected ? numAdding + 1 : numAdding - 1
+        let image = sender.isSelected ? #imageLiteral(resourceName: "icons8-checked-50") : #imageLiteral(resourceName: "icons8-full-moon-50")
+        sender.setImage(image, for: .normal)
+    }
+    
+    @IBAction func mutliAdd(_ sender: Any) {
+        if let button = sender as? UIButton{
+            if button.titleLabel?.text == "Add"{
+                // look through and add then return
+                var variationsToAdd = [Variant]()
+                for cell in tableView.visibleCells{
+                    if let varCell = cell as? variationCell, varCell.checkButton.isSelected == true{
+                        let indexPath = tableView.indexPath(for: cell)!
+                        variationsToAdd.append(variants[indexPath.row])
+                    }
+                }
+                returnVariantsToAdd(variationsToAdd)
+            }else{
+                isMultiAdding = !isMultiAdding
+                button.isSelected = !button.isSelected
+                button.layer.backgroundColor = button.isSelected ? button.tintColor.cgColor : UIColor.clear.cgColor
+                tableView.reloadData()
+            }
         }
     }
     
@@ -159,10 +185,17 @@ class individualExercise: UIViewController, UITableViewDelegate, UITableViewData
         ac.addAction(UIAlertAction(title: "Cancel", style: .default))
         present( ac, animated: true)
     }
-    
-    @IBAction func edit(_ sender: Any) {
-        isEditing = !isEditing
-        tableView.reloadData()
-    }
 
+
+    // MARK: - Returning Variants Selected
+    func returnVariantsToAdd(_ variantsToAdd:[Variant]){
+        if let todaysWorkout = todaysWorkoutDelegate{
+            todaysWorkout.addVariantToToday(variantsToAdd)
+            navigationController?.popToViewController(todaysWorkout, animated: true)
+        }
+        if let individualWorkout = individualWorkoutDelegate{
+            individualWorkout.addVariantToWorkout(variantsToAdd)
+            navigationController?.popToViewController(individualWorkout, animated: true)
+        }
+    }
 }

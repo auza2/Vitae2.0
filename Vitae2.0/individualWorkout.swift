@@ -21,7 +21,21 @@ class individualWorkout: UIViewController, UITableViewDelegate, UITableViewDataS
     weak var todaysWorkoutDelegate: TodaysWorkout?
     weak var individualWorkoutDelegate: individualWorkout?
     
+    var isMultiAdding:Bool = false{
+        didSet{
+            editButton.isEnabled = !isMultiAdding
+        }
+    }
+    var numAdding: Int = 0{
+        didSet{
+            let buttonLabel = (numAdding > 0 ) ? "Add" : "Multi Add"
+            multiAddButton.setTitle(buttonLabel, for: .normal)
+        }
+    }
+    
     @IBOutlet weak var tableView: UITableView!
+    @IBOutlet weak var multiAddButton: UIButton!
+    @IBOutlet weak var editButton: UIBarButtonItem!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -29,17 +43,6 @@ class individualWorkout: UIViewController, UITableViewDelegate, UITableViewDataS
 
         container = appDelegate.persistentContainer
         
-//        let exercise = Exercise(context: container.viewContext)
-//        exercise.name = "Dummy Exercise 2"
-//        let variant = Variant(context: container.viewContext)
-//        variant.sets = 12345
-//        variant.repetitions = 12345
-//        variant.weight = 12345
-//        variant.exercise = exercise
-//        workout.addToVariants(variant)
-//        appDelegate.saveContext()
-        
-
         tableView.dataSource = self
         tableView.delegate = self
         tableView.tableFooterView = UIView()
@@ -77,47 +80,20 @@ class individualWorkout: UIViewController, UITableViewDelegate, UITableViewDataS
             let exercisesHasExerciseAlready = exercises.contains{ exerciseInExercises in
                 return exerciseInExercises.name == exerciseForThisVariant.name
             }
-
+            
             if !exercisesHasExerciseAlready{
                 variants.append([Variant]())
                 exercises.append(exerciseForThisVariant)
                 exerciseIndex += 1
+                variants[variants.count-1].append(variant)
+            }else{
+                let indexOfExercise = exercises.index(of: exerciseForThisVariant) ?? variants.count-1
+                variants[indexOfExercise].append(variant)
             }
-
-            print("\(exerciseForThisVariant.name) | \(variant.sets) ,\(variant.repetitions), \(variant.weight) ")
-            variants[variants.count-1].append(variant)
         }
         print("-------------")
         
     }
-//    func loadSavedData(){
-//        let req = Exercise.createFetchRequest()
-//        let sort = NSSortDescriptor(key: "name", ascending: true)
-//        req.predicate = NSPredicate(format: "SUBQUERY(workouts, $x, $x.name == %@).@count == 1", workout.name)
-//        req.sortDescriptors = [sort]
-//
-//        do{
-//            exercises = try container.viewContext.fetch(req)
-//            tableView.reloadData()
-//            print("found \(exercises.count) exercises")
-//        }catch{
-//            print("Was not able to load Saved Data")
-//        }
-//
-//        variants.removeAll()
-////        for (_,exercise) in exercises.enumerated(){
-////            print("Getting variants for \(exercise.name)")
-////            let variantsForExercise = loadVariants(for: exercise)
-////            variants.append(variantsForExercise)
-////            print("size of variants for the exercise: \(variantsForExercise.count)")
-////        }
-//        for (_,exercise) in exercises.enumerated(){
-//            print("Getting variants for \(exercise.name)")
-//            let variantsForExercise = exercise.value(forKeyPath: "variants") as? [Variant] ?? [Variant]()
-//            variants.append(variantsForExercise)
-//            print("size of variants for the exercise: \(variantsForExercise.count)")
-//        }
-//    }
     
     func loadVariants(for exercise:Exercise) -> [Variant]{
         let req = Variant.createFetchRequest()
@@ -150,12 +126,25 @@ class individualWorkout: UIViewController, UITableViewDelegate, UITableViewDataS
         cell.variationLabel?.text = "\(variants[indexPath.section][(indexPath.row)].sets) X \(variants[indexPath.section][(indexPath.row)].repetitions) \(variants[indexPath.section][(indexPath.row)].weight)lb"
         
         if isEditing{
+            UIView.animate(withDuration: 0.5, animations: {
+                cell.checkButton.frame.origin.x = 20
+            })
             cell.checkButton.setImage(#imageLiteral(resourceName: "icons8-cancel-50"), for: .normal)
+            cell.checkButton.removeTarget(nil, action: nil, for: .allEvents)
             cell.checkButton.addTarget(self, action: #selector(deleteThisVariation(sender:)), for: .touchUpInside)
-        }else{
-            let image = (cell.checkButton.isSelected) ? #imageLiteral(resourceName: "icons8-tick-box-50") : #imageLiteral(resourceName: "icons8-unchecked-checkbox-50")
+        }else if isMultiAdding{
+            UIView.animate(withDuration: 0.5, animations: {
+                cell.checkButton.frame.origin.x = 20
+            })
+            
+            let image = (cell.checkButton.isSelected) ? #imageLiteral(resourceName: "icons8-checked-50") : #imageLiteral(resourceName: "icons8-full-moon-50")
             cell.checkButton.setImage(image, for: .normal)
-            cell.checkButton.addTarget(self, action: #selector(buttonTapped(sender:)), for: .touchUpInside)
+            cell.checkButton.removeTarget(nil, action: nil, for: .allEvents)
+            cell.checkButton.addTarget(self, action: #selector(mulitSelect(sender:)), for: .touchUpInside)
+        }else{
+            UIView.animate(withDuration: 0.5, animations: {
+                cell.checkButton.frame.origin.x = -cell.checkButton.frame.width
+            })
         }
         
         return cell
@@ -178,23 +167,21 @@ class individualWorkout: UIViewController, UITableViewDelegate, UITableViewDataS
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         if let todaysWorkout = todaysWorkoutDelegate{
-            todaysWorkout.addVariantToToday(variants[indexPath.section][indexPath.row])
+            todaysWorkout.addVariantToToday([variants[indexPath.section][indexPath.row]])
             navigationController?.popToViewController(todaysWorkout, animated: true)
         }
         if let individualWorkout = individualWorkoutDelegate{
-            individualWorkout.addVariantToWorkout(variants[indexPath.section][indexPath.row])
+            individualWorkout.addVariantToWorkout([variants[indexPath.section][indexPath.row]])
             navigationController?.popToViewController(individualWorkout, animated: true)
         }
     }
     
     // MARK: - Button taps
-    @objc func buttonTapped(sender: UIButton) {
+    @objc func mulitSelect(sender: UIButton) {
         sender.isSelected = !sender.isSelected
-        if sender.isSelected{
-            sender.setImage(#imageLiteral(resourceName: "icons8-tick-box-50"), for: .normal)
-        }else{
-            sender.setImage(#imageLiteral(resourceName: "icons8-unchecked-checkbox-50"), for: .normal)
-        }
+        numAdding = sender.isSelected ? numAdding + 1 : numAdding - 1
+        let image = sender.isSelected ? #imageLiteral(resourceName: "icons8-checked-50") : #imageLiteral(resourceName: "icons8-full-moon-50")
+        sender.setImage(image, for: .normal)
     }
     
     @objc func addButton(sender: UIButton!){
@@ -217,12 +204,46 @@ class individualWorkout: UIViewController, UITableViewDelegate, UITableViewDataS
         }
     }
     
+    @IBAction func multiAdd(_ sender: Any) {
+        if let button = sender as? UIButton{
+            if button.titleLabel?.text == "Add"{
+                // look through and add then return
+                var variationsToAdd = [Variant]()
+                for cell in tableView.visibleCells{
+                    if let varCell = cell as? variationCell, varCell.checkButton.isSelected == true{
+                        let indexPath = tableView.indexPath(for: cell)!
+                        variationsToAdd.append(variants[indexPath.section][indexPath.row])
+                    }
+                }
+                returnVariantsToAdd(variationsToAdd)
+            }else{
+                isMultiAdding = !isMultiAdding
+                button.isSelected = !button.isSelected
+                button.layer.backgroundColor = button.isSelected ? button.tintColor.cgColor : UIColor.clear.cgColor
+                tableView.reloadData()
+            }
+        }
+    }
+    
     // MARK: - Adding, Deleting, Editing Model
-    func addVariantToWorkout(_ variant: Variant){
-        workout.addToVariants(variant) //because we're using the same container this should work at creating a relationship
+    func addVariantToWorkout(_ variantsToAdd: [Variant]){
+        for eachVariant in variantsToAdd{
+            workout.addToVariants(eachVariant) // For some reason I cannot use "func addToVariants(_ values: [Variant])" to insert a whole array
+        }
         appDelegate.saveContext()
         loadSavedData()
         tableView.reloadData()
+    }
+    
+    func returnVariantsToAdd(_ variantsToAdd:[Variant]){
+        if let todaysWorkout = todaysWorkoutDelegate{
+            todaysWorkout.addVariantToToday(variantsToAdd)
+            navigationController?.popToViewController(todaysWorkout, animated: true)
+        }
+        if let individualWorkout = individualWorkoutDelegate{
+            individualWorkout.addVariantToWorkout(variantsToAdd)
+            navigationController?.popToViewController(individualWorkout, animated: true)
+        }
     }
     
     @objc func deleteThisVariation(sender: UIButton){
@@ -247,6 +268,7 @@ class individualWorkout: UIViewController, UITableViewDelegate, UITableViewDataS
     
     @IBAction func edit(_ sender: Any) {
         isEditing = !isEditing
+        multiAddButton.isEnabled = !isEditing
         tableView.reloadData()
     }
 
