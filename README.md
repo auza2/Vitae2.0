@@ -11,6 +11,6 @@ I finish and have the flexibility to change the workouts as I go or do the exact
 # Features
 <ul> Create Exercise </ul>
 <ul> Create Variation of Exercise </ul>
-<ul> Add Multiple exercises or full savewd workouts to Current Day's Workout </ul>
+<ul> Add multiple exercises or full saved workouts to Current Day's Workout </ul>
 <ul> See Data from every time an exercise was logged </ul>
 <ul> See progress data as a line graph </ul>
