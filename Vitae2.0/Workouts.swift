@@ -10,7 +10,7 @@ import UIKit
 import CoreData
 
 class Workouts: UITableViewController {
-     var appDelegate = UIApplication.shared.delegate as! AppDelegate
+    var appDelegate = UIApplication.shared.delegate as! AppDelegate
     var container: NSPersistentContainer!
     var workouts = [Workout]()
     weak var delegate: Exercises?

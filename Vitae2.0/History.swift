@@ -68,7 +68,7 @@ class History: UITableViewController, graphViewDataSource {
         
         // Going through all the variants for this exercise and going through each time it was logged
         // If there is no log
-        print("-----")
+        print("----- History --- ")
         var indexToInsert = 0
         for (_,variant) in allVariantsForExercise.enumerated(){
             if maxWeight < variant.weight{
@@ -95,7 +95,7 @@ class History: UITableViewController, graphViewDataSource {
                 variants[indexToInsert].append(variant)
             }
         }
-        print("-----")
+        print("----- History ----")
     }
     
     // Binary search to find the placement of this log and its variants
@@ -149,7 +149,8 @@ class History: UITableViewController, graphViewDataSource {
         let start = startDate().getStartOfDay() as Date
         let end = endDate().getStartOfDay() as Date
         let numColums = Int( start.timeIntervalSince(end)/60/60/24 )
-        return numColums + 1
+        let add = (numColums > 0) ? 1 : -1
+        return numColums + add
     }
     
     func columnForPoint(_ graphView: GraphView, _ dataIndex:Int) -> Int {
@@ -225,6 +226,7 @@ class History: UITableViewController, graphViewDataSource {
         ac.addAction(UIAlertAction(title: "Newest", style: .default, handler: {
             [unowned self] action in
                 self.sortByOption = .Newest
+                // to do redraw the graph when this is done re ordering
             }))
         
         ac.addAction(UIAlertAction(title: "Oldest", style: .default, handler: {

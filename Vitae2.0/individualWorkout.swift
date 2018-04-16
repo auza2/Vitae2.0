@@ -152,11 +152,6 @@ class individualWorkout: UIViewController, UITableViewDelegate, UITableViewDataS
     
     func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
         guard let headerView = tableView.dequeueReusableCell(withIdentifier: "sectionHeader") as? sectionHeader else {return UIView()}
-        if isEditing{
-            headerView.addButton.addTarget(self, action: #selector(addButton(sender:)), for: .touchUpInside)
-        }else{
-            headerView.addButton.removeFromSuperview()
-        }
         headerView.headerTitle?.text = exercises[section].name.uppercased()
         return headerView
     }
@@ -184,9 +179,6 @@ class individualWorkout: UIViewController, UITableViewDelegate, UITableViewDataS
         sender.setImage(image, for: .normal)
     }
     
-    @objc func addButton(sender: UIButton!){
-        print("buttonTapped")
-    }
     
     @IBAction func openWorkoutLibrary(_ sender: Any) {
         if let vc = storyboard?.instantiateViewController(withIdentifier: "ExerciseLibrary") as? UITabBarController{

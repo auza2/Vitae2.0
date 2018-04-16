@@ -106,7 +106,6 @@ class individualExercise: UIViewController, UITableViewDelegate, UITableViewData
 
     func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
         guard let headerView = tableView.dequeueReusableCell(withIdentifier: "sectionHeader") as? sectionHeader else {return UIView()}
-        headerView.addButton.removeFromSuperview() // the ability to add is already in the navigation view
         headerView.headerTitle?.text = dummyExerciseName
         return headerView
     }

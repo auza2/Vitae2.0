@@ -14,7 +14,6 @@ class sectionHeader: UITableViewCell{
     var section: Int!
     @IBOutlet weak var moreOptionsButton: UIButton!
     @IBOutlet weak var headerTitle: UILabel!
-    @IBOutlet weak var addButton: UIButton!
     
     @IBAction func moreOptions(_ sender: Any) {
         delegate.moreOptions(self)
@@ -172,11 +171,6 @@ class TodaysWorkout: UIViewController, UITableViewDelegate,UITableViewDataSource
         headerView.delegate = self
         headerView.section = section
        
-        if isEditing{
-            headerView.addButton.addTarget(self, action: #selector(addButton(sender:)), for: .touchUpInside)
-        }else{
-            headerView.addButton.removeFromSuperview()
-        }
         headerView.headerTitle?.text = exercises[section].name.uppercased()
         return headerView
     }

@@ -55,15 +55,9 @@
                                                     </attributedString>
                                                     <nil key="highlightedColor"/>
                                                 </label>
-                                                <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" showsTouchWhenHighlighted="YES" adjustsImageSizeForAccessibilityContentSizeCategory="YES" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="dwe-VQ-H9J">
-                                                    <rect key="frame" x="331" y="7" width="30" height="30"/>
-                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                                    <state key="normal" image="icons8-plus-50"/>
-                                                </button>
                                             </subviews>
                                         </tableViewCellContentView>
                                         <connections>
-                                            <outlet property="addButton" destination="dwe-VQ-H9J" id="Dty-93-67J"/>
                                             <outlet property="headerTitle" destination="6eg-EG-6HG" id="ydL-J0-r4n"/>
                                             <outlet property="moreOptionsButton" destination="J88-yk-1Mu" id="hPJ-p7-FrM"/>
                                         </connections>
@@ -155,7 +149,7 @@
                         <rect key="frame" x="0.0" y="0.0" width="414" height="687"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                        <view key="tableHeaderView" contentMode="scaleToFill" id="Djt-Q5-2KI">
+                        <view key="tableHeaderView" contentMode="scaleToFill" misplaced="YES" id="Djt-Q5-2KI">
                             <rect key="frame" x="0.0" y="0.0" width="414" height="44"/>
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                             <subviews>
@@ -257,7 +251,7 @@
                         <rect key="frame" x="0.0" y="0.0" width="414" height="687"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                        <view key="tableHeaderView" contentMode="scaleToFill" id="JW4-Y8-l7c">
+                        <view key="tableHeaderView" contentMode="scaleToFill" misplaced="YES" id="JW4-Y8-l7c">
                             <rect key="frame" x="0.0" y="0.0" width="414" height="44"/>
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                             <subviews>
@@ -350,15 +344,9 @@
                                                     </attributedString>
                                                     <nil key="highlightedColor"/>
                                                 </label>
-                                                <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" showsTouchWhenHighlighted="YES" adjustsImageSizeForAccessibilityContentSizeCategory="YES" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="VMf-06-VUY">
-                                                    <rect key="frame" x="331" y="7" width="30" height="30"/>
-                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                                    <state key="normal" image="icons8-plus-50"/>
-                                                </button>
                                             </subviews>
                                         </tableViewCellContentView>
                                         <connections>
-                                            <outlet property="addButton" destination="VMf-06-VUY" id="hlb-81-gbv"/>
                                             <outlet property="headerTitle" destination="N4Z-m1-czv" id="wXw-dV-aAN"/>
                                             <outlet property="moreOptionsButton" destination="9fs-Bf-fns" id="Dpl-Mt-eAL"/>
                                         </connections>
@@ -511,7 +499,7 @@
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
                                         <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" insetsLayoutMarginsFromSafeArea="NO" text="Title" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="JMo-Ye-Dbg">
-                                            <rect key="frame" x="70" y="0.0" width="324" height="43.5"/>
+                                            <rect key="frame" x="70" y="0.0" width="324" height="43.666666666666664"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                             <nil key="textColor"/>
@@ -528,7 +516,7 @@
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
                                         <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" insetsLayoutMarginsFromSafeArea="NO" text="Title" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="yrp-mK-7JY">
-                                            <rect key="frame" x="20" y="0.0" width="374" height="43.5"/>
+                                            <rect key="frame" x="20" y="0.0" width="374" height="43.666666666666664"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                             <nil key="textColor"/>
@@ -613,15 +601,9 @@
                                                     </attributedString>
                                                     <nil key="highlightedColor"/>
                                                 </label>
-                                                <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" showsTouchWhenHighlighted="YES" adjustsImageSizeForAccessibilityContentSizeCategory="YES" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="evB-yt-5tZ">
-                                                    <rect key="frame" x="331" y="7" width="30" height="30"/>
-                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                                    <state key="normal" image="icons8-plus-50"/>
-                                                </button>
                                             </subviews>
                                         </tableViewCellContentView>
                                         <connections>
-                                            <outlet property="addButton" destination="evB-yt-5tZ" id="uk3-6a-hdR"/>
                                             <outlet property="headerTitle" destination="a8f-BP-uKY" id="LlS-nX-KiI"/>
                                             <outlet property="moreOptionsButton" destination="Xh7-Kt-NWA" id="eWA-eA-9Z1"/>
                                         </connections>
@@ -704,7 +686,6 @@
     </scenes>
     <resources>
         <image name="icons8-full-moon-50" width="50" height="50"/>
-        <image name="icons8-plus-50" width="50" height="50"/>
         <image name="icons8-unchecked-checkbox-50" width="50" height="50"/>
         <image name="icons8-view-more-filled-50" width="50" height="50"/>
     </resources>
