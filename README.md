@@ -3,7 +3,9 @@ Improved Workout Logging App
 Video: https://youtu.be/GwMcQsm7otE
 
 # Screenshots
-
+![Screenshot](Today's Workout.png)
+![Screenshot](Workout View.png)
+![Screenshot](Exercise Data View.png)
 
 # Motivation
 I wanted to create this app because I've been using Google Keep as a workout list. 
