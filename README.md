@@ -1,5 +1,9 @@
 # Vitae2.0
 Improved Workout Logging App
+Video: https://youtu.be/GwMcQsm7otE
+
+# Screenshots
+
 
 # Motivation
 I wanted to create this app because I've been using Google Keep as a workout list. 
