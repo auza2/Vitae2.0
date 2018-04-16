@@ -4,7 +4,8 @@ Video: https://youtu.be/GwMcQsm7otE
 
 # Screenshots
 ![Screenshot](https://raw.github.com/auza2/Vitae2.0/master/Today's%20Workout.png)
-
+![Screenshot](https://raw.github.com/auza2/Vitae2.0/master/Workout%20View.png)
+![Screenshot](https://raw.github.com/auza2/Vitae2.0/master/Exercise%20Data%20View.png)
 
 # Motivation
 I wanted to create this app because I've been using Google Keep as a workout list. 
