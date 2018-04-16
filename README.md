@@ -3,7 +3,7 @@ Improved Workout Logging App
 Video: https://youtu.be/GwMcQsm7otE
 
 # Screenshots
-![Screenshot](Today's Workout.png)
+![Screenshot](https://raw.github.com/auza2/Vitae2.0/blob/master/Today's%20Workout.png)
 
 
 # Motivation
